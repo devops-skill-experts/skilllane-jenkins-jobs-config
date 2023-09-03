@@ -1,29 +1,81 @@
 #!/usr/bin/env groovy
 
-multibranchPipelineJob('CRUD-API'){
-    branchSources {
-        branchSource {
-            source {
-                git {
-                    id = 'skilllane-crud-example'
-                    remote('https://github.com/devops-skill-experts/skilllane-crud-example.git')
-                    credentialsId('')
-                    traits {
-                        gitBranchDiscovery()
-                        gitTagDiscovery()
-                    }
-                }
+multibranchPipelineJob('CRUD-API')
+{
+    displayName('CRUD_API_Multi_Branch')
+    branchSources
+    {
+        git
+        {
+            id('skilllane-crud-example')
+            remote('https://github.com/devops-skill-experts/skilllane-crud-example.git')
+            credentialsId('')
+            includes('develop test master main')
+        }
+    }
+
+    factory
+    {
+        remoteJenkinsFileWorkflowBranchProjectFactory 
+        {
+            remoteJenkinsFile("Jenkinsfile")
+            localMarker("")
+            matchBranches(false)
+            fallbackBranch("master")
+        }
+    }
+
+    configure { project ->
+        def extensionsNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
+
+        extensionsNode << 'jenkins.plugins.git.traits.BranchDiscoveryTrait'{
+        }        
+        
+        extensionsNode << 'jenkins.plugins.git.traits.CloneOptionTrait' {
+            extension(class:'hudson.plugins.git.extensions.impl.CloneOption')
+            {
+                shallow(false)
+                noTags(false)
+                reference('')
+                timeout(39)
+                honorRefspec(false)
             }
-            strategy {
-                defaultBranchPropertyStrategy {
-                    props {
-                        noTriggerBranchProperty()
+        }
+        
+        def branchSourceNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource'
+        branchSourceNode << 'buildStrategies' {
+            'jenkins.branch.buildstrategies.basic.NamedBranchBuildStrategyImpl'
+            {
+                'filters'
+                {
+                    'jenkins.branch.buildstrategies.basic.NamedBranchBuildStrategyImpl_-WildcardsNameFilter'
+                    {
+                        includes('develop test master main')
                     }
                 }
             }
         }
     }
 
-    displayName('CRUD_API_Multi_Branch')
-    orphanedItemStrategy { discardOldItems { numToKeep(-1) } }
+    configure { project ->
+        def extensionsNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
+
+        extensionsNode << 'jenkins.plugins.git.traits.TagDiscoveryTrait'{
+        }               
+        def branchSourceNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'buildStrategies'
+        branchSourceNode << 'jenkins.branch.buildstrategies.basic.TagBuildStrategyImpl'{                    
+            atLeastMillis(-1)
+            atMostMillis(86400000)                    
+        }             
+    }
+
+    configure { project ->
+        def extensionsNode = project
+        extensionsNode << disabled(true)
+    }
+
+    triggers
+    {
+        cron('*/10 * * * *')
+    }
 }
