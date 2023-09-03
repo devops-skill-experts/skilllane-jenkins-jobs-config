@@ -14,57 +14,13 @@ multibranchPipelineJob('CRUD-API')
         }
     }
 
-    configure { project ->
-        def extensionsNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
-
-        extensionsNode << 'jenkins.plugins.git.traits.BranchDiscoveryTrait'{
-        }        
-        
-        extensionsNode << 'jenkins.plugins.git.traits.CloneOptionTrait' {
-            extension(class:'hudson.plugins.git.extensions.impl.CloneOption')
-            {
-                shallow(false)
-                noTags(false)
-                reference('')
-                timeout(39)
-                honorRefspec(false)
-            }
-        }
-        
-        def branchSourceNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource'
-        branchSourceNode << 'buildStrategies' {
-            'jenkins.branch.buildstrategies.basic.NamedBranchBuildStrategyImpl'
-            {
-                'filters'
-                {
-                    'jenkins.branch.buildstrategies.basic.NamedBranchBuildStrategyImpl_-WildcardsNameFilter'
-                    {
-                        includes('develop test master main')
-                    }
-                }
-            }
-        }
-    }
-
-    configure { project ->
-        def extensionsNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
-
-        extensionsNode << 'jenkins.plugins.git.traits.TagDiscoveryTrait'{
-        }               
-        def branchSourceNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'buildStrategies'
-        branchSourceNode << 'jenkins.branch.buildstrategies.basic.TagBuildStrategyImpl'{                    
-            atLeastMillis(-1)
-            atMostMillis(86400000)                    
-        }             
+    triggers
+    {
+        cron('*/10 * * * *')
     }
 
     configure { project ->
         def extensionsNode = project
         extensionsNode << disabled(true)
-    }
-
-    triggers
-    {
-        cron('*/10 * * * *')
     }
 }
