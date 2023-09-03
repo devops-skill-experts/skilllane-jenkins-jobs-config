@@ -14,17 +14,6 @@ multibranchPipelineJob('CRUD-API')
         }
     }
 
-    factory
-    {
-        remoteJenkinsFileWorkflowBranchProjectFactory 
-        {
-            remoteJenkinsFile("Jenkinsfile")
-            localMarker("")
-            matchBranches(false)
-            fallbackBranch("master")
-        }
-    }
-
     configure { project ->
         def extensionsNode = project / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
 
