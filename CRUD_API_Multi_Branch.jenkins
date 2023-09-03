@@ -16,6 +16,6 @@ multibranchPipelineJob('CRUD-API')
 
     triggers
     {
-        cron('H/1 * * * *')
+        cron('*/1 * * * *')
     }
 }
