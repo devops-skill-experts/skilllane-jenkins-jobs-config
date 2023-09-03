@@ -1,1 +1,0 @@
-# skilllane-jenkins-jobs-config
