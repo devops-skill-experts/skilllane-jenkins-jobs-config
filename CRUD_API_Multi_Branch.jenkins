@@ -18,9 +18,4 @@ multibranchPipelineJob('CRUD-API')
     {
         cron('*/10 * * * *')
     }
-
-    configure { project ->
-        def extensionsNode = project
-        extensionsNode << disabled(true)
-    }
 }
