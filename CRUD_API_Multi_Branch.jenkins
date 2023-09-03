@@ -24,6 +24,6 @@ multibranchPipelineJob('CRUD-API'){
         }
     }
 
-    displayName('CRUD-API Multi-branch')
+    displayName('CRUD-API Multi-Branch')
     orphanedItemStrategy { discardOldItems { numToKeep(-1) } }
 }
